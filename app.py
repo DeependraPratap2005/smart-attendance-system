@@ -1,37 +1,58 @@
-from flask import Flask, render_template
-import os
+from flask import Flask, render_template, request, redirect, url_for
+import subprocess
 
 app = Flask(__name__)
 
-@app.route("/")
-def home():
+# 🔐 Login Route (GET + POST)
+@app.route("/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # Simple login (change as needed)
+        if username == "admin" and password == "1234":
+            return redirect(url_for("dashboard"))
+        else:
+            return "Invalid Credentials"
+
     return render_template("login.html")
 
+
+# 📝 Register Student
 @app.route("/register")
 def register():
-    os.system("python register_student.py")
+    subprocess.run(["python", "register_student.py"])
     return "Student Registered!"
 
+
+# 📸 Create Dataset
 @app.route("/dataset")
 def dataset():
-    os.system("python dataset_creator.py")
+    subprocess.run(["python", "dataset_creator.py"])
     return "Dataset Created!"
 
+
+# 🧠 Train Model
 @app.route("/train")
 def train():
-    os.system("python train_model.py")
+    subprocess.run(["python", "train_model.py"])
     return "Model Trained!"
 
+
+# 🎥 Recognize Face / Attendance
 @app.route("/recognize")
 def recognize():
-    os.system("python recognize.py")
+    subprocess.run(["python", "recognize.py"])
     return "Attendance Started!"
 
+
+# 📊 Dashboard Page
 @app.route("/dashboard")
 def dashboard():
-    os.system("python dashboard.py")
-    return "Dashboard Opened!"
+    return render_template("dashboard.html")
 
+
+# ▶ Run App
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=5000)
