@@ -130,10 +130,10 @@ line-height:1.5;
 <div class="error">{{ error }}</div>
 {% endif %}
 
-<form method="POST">
+<!-- ✅ IMPORTANT FIX: action="/" -->
+<form method="POST" action="/">
 
-<!-- ✅ FIXED NAMES -->
-<input type="text" name="username" placeholder="Enter Admin Email / Student UID" required>
+<input type="text" name="username" placeholder="Enter Admin Username / Student UID" required>
 
 <input type="password" name="password" placeholder="Enter Password" required>
 
@@ -148,7 +148,7 @@ line-height:1.5;
 </form>
 
 <div class="note">
-Admin Login: admin / 1234<br>
+Admin Login: <b>admin / 1234</b><br>
 Student Login: UID as Username & UID as Password
 </div>
 
