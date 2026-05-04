@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Attendance Admin Panel V2</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#08142b,#16253f,#24344d);
+color:#fff;
+min-height:100vh;
+}
+
+.container{
+width:95%;
+margin:auto;
+padding:25px;
+}
+
+h1{
+text-align:center;
+font-size:34px;
+margin-bottom:25px;
+font-weight:700;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:20px;
+}
+
+select,input{
+padding:12px;
+border:none;
+border-radius:10px;
+outline:none;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:18px;
+margin-bottom:22px;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+padding:22px;
+border-radius:18px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.card h3{
+font-size:16px;
+font-weight:400;
+margin-bottom:8px;
+}
+
+.card h2{
+font-size:34px;
+font-weight:700;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:22px;
+margin-bottom:22px;
+}
+
+.box{
+background:rgba(255,255,255,0.08);
+padding:22px;
+border-radius:18px;
+box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.box h2{
+margin-bottom:15px;
+}
+
+form input,form select{
+width:100%;
+margin-bottom:12px;
+}
+
+button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+color:#fff;
+font-weight:600;
+margin:3px;
+}
+
+.green{background:#16a34a;}
+.red{background:#dc2626;}
+.blue{background:#2563eb;}
+.orange{background:#ea580c;}
+.purple{background:#7c3aed;}
+.gray{background:#475569;}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+padding:12px;
+text-align:center;
+border-bottom:1px solid rgba(255,255,255,.08);
+font-size:14px;
+}
+
+tr:hover{
+background:rgba(255,255,255,.04);
+}
+
+canvas{
+background:#fff;
+border-radius:14px;
+padding:10px;
+max-height:320px;
+}
+
+.actions{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:6px;
+}
+
+.status{
+padding:6px 12px;
+border-radius:30px;
+font-size:13px;
+font-weight:700;
+background:#dc2626;
+display:inline-block;
+}
+
+.search{
+width:100%;
+margin-top:10px;
+}
+
+@media(max-width:1100px){
+.cards,.grid{
+grid-template-columns:1fr;
+}
+table{
+font-size:12px;
+}
+.actions{
+flex-direction:column;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎓 Smart Attendance Admin Panel V2</h1>
+
+<!-- FILTER -->
+<div class="topbar">
+<div>
+<select onchange="location=this.value">
+<option value="/admin?filter=today">Today Report</option>
+<option value="/admin?filter=weekly">Weekly Report</option>
+<option value="/admin?filter=monthly">Monthly Report</option>
+<option value="/admin?filter=yearly">Yearly Report</option>
+</select>
+</div>
+
+<div>
+<span class="status" id="status">OFF</span>
+</div>
+</div>
+
+<!-- CARDS -->
+<div class="cards">
+
+<div class="card">
+<h3>Total Students</h3>
+<h2>{{ total_students }}</h2>
+</div>
+
+<div class="card">
+<h3>Present</h3>
+<h2>{{ present }}</h2>
+</div>
+
+<div class="card">
+<h3>Absent</h3>
+<h2>{{ absent }}</h2>
+</div>
+
+<div class="card">
+<h3>Attendance %</h3>
+<h2>{{ percent }}%</h2>
+</div>
+
+</div>
+
+<!-- FORMS -->
+<div class="grid">
+
+<div class="box">
+<h2>➕ Add Student</h2>
+
+<form method="POST" action="/add">
+<input type="text" name="name" placeholder="Student Name" required>
+<input type="text" name="uid" placeholder="UID" required>
+<input type="text" name="course" placeholder="Course" required>
+<input type="email" name="email" placeholder="Parent Email">
+<input type="text" name="phone" placeholder="Parent Phone">
+<button class="green">Add Student</button>
+</form>
+</div>
+
+<div class="box">
+<h2>📅 Attendance Control</h2>
+
+<form method="POST" action="/start_attendance">
+<input type="text" name="subject" placeholder="Subject" required>
+<input type="text" name="faculty" placeholder="Faculty" required>
+
+<input type="date" name="date" required>
+
+<select name="time_slot">
+<option>9-10</option>
+<option>10-11</option>
+<option>11-12</option>
+<option>1-2</option>
+<option>2-3</option>
+<option>3-4</option>
+</select>
+
+<button class="blue">Start Attendance</button>
+<a href="/stop"><button type="button" class="red">Stop</button></a>
+<a href="/export"><button type="button" class="orange">Export CSV</button></a>
+<a href="/logout"><button type="button" class="gray">Logout</button></a>
+
+</form>
+</div>
+
+</div>
+
+<!-- GRAPH -->
+<div class="box">
+<h2>📊 Overall Analytics</h2>
+<canvas id="chart"></canvas>
+</div>
+
+<!-- STUDENTS -->
+<div class="box" style="margin-top:22px;">
+<h2>👨‍🎓 Students Management</h2>
+
+<input type="text" id="search" class="search" placeholder="Search student...">
+
+<table id="studentTable">
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>UID</th>
+<th>Course</th>
+<th>Actions</th>
+</tr>
+
+{% for s in students %}
+<tr>
+<td>{{ s.id }}</td>
+<td>{{ s.name }}</td>
+<td>{{ s.uid }}</td>
+<td>{{ s.course }}</td>
+
+<td>
+
+<a href="/edit/{{ s.id }}">
+<button class="orange">Edit</button>
+</a>
+
+<a href="/delete/{{ s.id }}">
+<button class="red">Delete</button>
+</a>
+
+{% if s.has_face %}
+
+<a href="/remove_face/{{ s.uid }}">
+<button class="purple">Remove Face</button>
+</a>
+
+{% else %}
+
+<a href="/add_face/{{ s.uid }}">
+<button class="green">Add Face</button>
+</a>
+
+{% endif %}
+
+<a href="/report/{{ s.name }}">
+<button class="blue">Attendance</button>
+</a>
+
+</td>
+</tr>
+{% endfor %}
+
+</table>
+</div>
+
+</div>
+
+<script>
+const ctx=document.getElementById("chart");
+
+new Chart(ctx,{
+type:"bar",
+data:{
+labels:["Present","Absent"],
+datasets:[{
+data:[{{ present }},{{ absent }}]
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false
+}
+});
+
+function loadStatus(){
+fetch("/status")
+.then(r=>r.json())
+.then(data=>{
+document.getElementById("status").innerText=data.status;
+});
+}
+setInterval(loadStatus,1000);
+loadStatus();
+
+document.getElementById("search").addEventListener("keyup",function(){
+let val=this.value.toLowerCase();
+let rows=document.querySelectorAll("#studentTable tr");
+
+rows.forEach((row,i)=>{
+if(i==0)return;
+row.style.display=row.innerText.toLowerCase().includes(val) ? "" : "none";
+});
+});
+</script>
+
+</body>
+</html>
